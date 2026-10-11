@@ -1,0 +1,54 @@
+/* ==================== COMPONENTES COMPARTIDOS ==================== */
+
+/* Botones */
+.btn {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.btn-primary { background-color: var(--color-navbar); color: #fff; }
+.btn-primary:hover { background-color: #26335a; }
+.btn-danger { background-color: var(--color-red); color: #fff; }
+.btn-danger:hover { background-color: #c93b3a; }
+.btn-outline { background: transparent; color: var(--color-navbar); border-color: #c4cada; }
+.btn-outline:hover { background-color: rgba(26, 35, 64, 0.05); border-color: var(--color-navbar); }
+.btn-full { width: 100%; }
+.btn-group { display: flex; gap: var(--space-2); }
+.btn-group .btn { flex: 1; }
+
+/* Badges de estado */
+.badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.badge-green { background-color: #d1fae5; color: #065f46; }
+.badge-red { background-color: #fee2e2; color: #991b1b; }
+.badge-amber { background-color: #fef3c7; color: #92400e; }
+.badge-blue { background-color: #dbeafe; color: #1e40af; }
+
+/* Banner de alerta */
+.alert-banner {
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    font-weight: 600;
+    text-align: center;
+    animation: pulso-alerta 1.5s infinite;
+}
+.alert-banner.nivel-amarillo { background-color: var(--color-amber); color: #4a2e00; }
+.alert-banner.nivel-rojo { background-color: var(--color-red); color: #fff; }
+@keyframes pulso-alerta { 50% { opacity: 0.75; } }
+
+/* Tarjetas */
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-card-border);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-card);
+}
+.card-header { margin-bottom: var(--space-4); }
+.card-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--color-navbar); }
+.card-text { font-size: 14px; color: var(--color-text-muted); margin-bottom: var(--space-4); max-width: 60ch; }
+.mt-sm { margin-top: var(--space-3); }

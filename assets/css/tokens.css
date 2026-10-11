@@ -1,0 +1,30 @@
+/* ==================== TOKENS DE DISEÑO ==================== */
+:root {
+    /* Color */
+    --color-bg: #eef1f5;
+    --color-surface: #ffffff;
+    --color-navbar: #1A2340;
+    --color-accent-green: #1D9E75;
+    --color-accent-lightgreen: #00C896;
+    --color-red: #E24B4A;
+    --color-amber: #EF9F27;
+    --color-card-border: #e3e7ee;
+    --color-text: #1b2233;
+    --color-text-muted: #5d667a;
+
+    /* Tipografía */
+    --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --font-display: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
+
+    /* Forma y espacio */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --shadow-card: 0 1px 2px rgba(26, 35, 64, 0.06), 0 4px 14px rgba(26, 35, 64, 0.05);
+    --focus-ring: 0 0 0 3px rgba(0, 200, 150, 0.45);
+}

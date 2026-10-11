@@ -1,0 +1,18 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "usuarios_v2": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "dispositivos": {
+      "$deviceId": {
+        ".read": "auth != null && data.child('ownerUid').val() === auth.uid",
+        ".write": false
+      }
+    }
+  }
+}

@@ -1,0 +1,100 @@
+/* ==================== LOGIN Y REGISTRO ==================== */
+.auth-wrapper {
+    background-color: var(--color-navbar);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.brand-dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-accent-lightgreen);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color-navbar);
+}
+
+.auth-card h2 {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--color-navbar);
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #f9fafb;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+}
+.field-hint.hint-error { color: var(--color-red); font-weight: 600; }
+.field-hint.hint-ok { color: var(--color-accent-green); font-weight: 600; }
+
+#reg-codigo.input-error { border-color: var(--color-red); background-color: #fef2f2; }
+#reg-codigo.input-ok { border-color: var(--color-accent-green); background-color: #f0fdf9; }
+
+.form-group input:focus {
+    border-color: var(--color-accent-green);
+    box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.18);
+}
+
+.auth-footer {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 16px;
+    color: var(--color-text-muted);
+}
+
+.auth-footer a {
+    color: var(--color-accent-green);
+    text-decoration: none;
+    font-weight: bold;
+}
+
