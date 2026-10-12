@@ -1,4 +1,7 @@
 node_modules/
 .env
+.env.*
+!.env.example
 secrets/
+firebase-admin.json
 *.log

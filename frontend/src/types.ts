@@ -6,6 +6,7 @@ export type DeviceInfo = {
   latitud?: number | string;
   longitud?: number | string;
   actualizadoEn?: string | number;
+  ultimaConexion?: number;
   ownerUid?: string;
   historial?: Record<string, unknown>;
   alertas?: Record<string, any>;
