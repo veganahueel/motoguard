@@ -1,28 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="es-AR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="MotoGuard: GPS en tiempo real, sensor de vibración y alertas por Telegram para proteger tu moto.">
-    <meta name="theme-color" content="#1A2340">
-    <title>MotoGuard - Panel de Control</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-    <!-- Estilos por capas: tokens > base > componentes > páginas -->
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/landing.css">
-    <link rel="stylesheet" href="assets/css/auth.css">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a30">
+  <meta name="description" content="Conocé MotoGuard, un prototipo de protección inteligente para motocicletas basado en ESP32, detección de vibración y movimiento, y monitoreo remoto desde una aplicación.">
+  <title>MotoGuard | Protección inteligente para motocicletas</title>
+  <link rel="icon" href="./img/favicon.png" type="image/png">
+  <meta property="og:title" content="MotoGuard | Protección inteligente para motocicletas">
+  <meta property="og:description" content="Conocé el prototipo MotoGuard, sus sensores y la aplicación Android.">
+  <meta property="og:image" content="./img/motoguard-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="./css/tokens.css" rel="stylesheet">
+  <link href="./css/base.css" rel="stylesheet">
+  <link href="./css/landing.css" rel="stylesheet">
+  <link href="./css/site.css" rel="stylesheet">
+  <script src="./js/site.js" defer></script>
 </head>
 <body>
-    <!-- ==================== LANDING PAGE ==================== -->
-    <svg class="sprite" aria-hidden="true" focusable="false"><defs>
+<svg class="sprite" aria-hidden="true" focusable="false"><defs>
 <symbol id="s-sw420" viewBox="0 0 120 90"><rect x="6" y="10" width="108" height="62" rx="6" fill="#2563c9"/><circle cx="14" cy="18" r="3" fill="#0e1630"/><circle cx="106" cy="18" r="3" fill="#0e1630"/><circle cx="34" cy="41" r="16" fill="#d1d5db" stroke="#9ca3af" stroke-width="2"/><circle cx="34" cy="41" r="6" fill="#4b5563"/><rect x="62" y="26" width="24" height="24" rx="3" fill="#1d4ed8" stroke="#93c5fd"/><circle cx="74" cy="38" r="6" fill="#e5e7eb"/><circle cx="98" cy="26" r="3.5" fill="#34d399"><animate attributeName="opacity" values=".3;1;.3" dur="4s" repeatCount="indefinite"/></circle><path d="M20 80h80" stroke="#d9b14a" stroke-width="6" stroke-dasharray="5 3" fill="none"/></symbol>
 <symbol id="s-mpu" viewBox="0 0 120 90"><rect x="6" y="10" width="108" height="62" rx="6" fill="#0e7490"/><circle cx="14" cy="18" r="3" fill="#0e1630"/><circle cx="106" cy="18" r="3" fill="#0e1630"/><rect x="42" y="22" width="36" height="36" rx="3" fill="#1f2937" stroke="#4b5563"/><circle cx="48" cy="28" r="2" fill="#9ca3af"/><text x="60" y="44" text-anchor="middle" font-size="8" font-weight="700" fill="#9ca3af">6050</text><rect x="14" y="30" width="12" height="9" fill="#1f2937"/><rect x="94" y="30" width="12" height="9" fill="#1f2937"/><circle cx="98" cy="58" r="3" fill="#34d399"><animate attributeName="opacity" values=".3;1;.3" dur="5s" repeatCount="indefinite"/></circle><path d="M20 80h80" stroke="#d9b14a" stroke-width="6" stroke-dasharray="5 3" fill="none"/></symbol>
 <symbol id="s-gps" viewBox="0 0 120 90"><rect x="6" y="10" width="108" height="62" rx="6" fill="#1e3a8a"/><rect x="14" y="16" width="46" height="46" rx="3" fill="#e8d9a8" stroke="#b99a45" stroke-width="2"/><rect x="21" y="23" width="32" height="32" fill="#d6c27a"/><rect x="72" y="20" width="28" height="26" rx="2" fill="#111827"/><rect x="72" y="52" width="22" height="10" rx="2" fill="#9ca3af"/><circle cx="104" cy="56" r="3" fill="#34d399"><animate attributeName="opacity" values=".3;1;.3" dur="3s" repeatCount="indefinite"/></circle><path d="M20 80h80" stroke="#d9b14a" stroke-width="6" stroke-dasharray="5 3" fill="none"/></symbol>
@@ -30,330 +28,97 @@
 <symbol id="s-esp32" viewBox="0 0 120 90"><rect x="6" y="10" width="108" height="62" rx="6" fill="#111827" stroke="#374151" stroke-width="2"/><rect x="26" y="20" width="58" height="38" rx="2" fill="#cbd5e1"/><text x="55" y="44" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">ESP32</text><polyline points="90,28 94,18 98,36 102,18 106,36" fill="none" stroke="#d9b14a" stroke-width="2"/><circle cx="98" cy="58" r="3" fill="#38bdf8"><animate attributeName="opacity" values=".3;1;.3" dur="4s" repeatCount="indefinite"/></circle><path d="M14 80h92" stroke="#d9b14a" stroke-width="6" stroke-dasharray="5 3" fill="none"/></symbol>
 <symbol id="s-sim" viewBox="0 0 120 90"><rect x="6" y="10" width="108" height="62" rx="6" fill="#b91c1c"/><circle cx="20" cy="24" r="6" fill="#d9b14a" stroke="#92711f" stroke-width="2"/><rect x="38" y="18" width="38" height="38" rx="2" fill="#111827"/><text x="57" y="40" text-anchor="middle" font-size="7" font-weight="700" fill="#9ca3af">SIM800L</text><rect x="86" y="42" width="22" height="20" rx="2" fill="#9ca3af"/><circle cx="26" cy="56" r="3" fill="#fbbf24"><animate attributeName="opacity" values=".3;1;.3" dur="3s" repeatCount="indefinite"/></circle><path d="M20 80h80" stroke="#d9b14a" stroke-width="6" stroke-dasharray="5 3" fill="none"/></symbol>
 </defs></svg>
-    <div id="screen-landing" class="landing-wrapper">
-        <div class="landing-top">
-            <nav class="landing-nav">
-                <div class="landing-brand">
-                    <span class="landing-brand-mark"></span>
-                    <span class="landing-brand-name">MotoGuard</span>
-                </div>
-                <div class="landing-nav-links">
-                    <a href="#como-funciona">Cómo funciona</a>
-                    <a href="#hardware">Hardware</a>
-                    <a href="#contacto">Contacto</a>
-                </div>
-                <div class="landing-nav-auth">
-                    <a href="#" id="landing-link-login" class="landing-link-login">Iniciar sesión</a>
-                    <button id="landing-btn-register" class="btn-landing-primary">Crear cuenta</button>
-                </div>
-            </nav>
-
-            <header class="landing-hero">
-                <div class="hero-copy">
-                    <h1>Tu moto, ubicada minuto a minuto.</h1>
-                    <p>MotoGuard combina GPS en tiempo real, un sensor de vibración y alertas instantáneas por Telegram. Apenas alguien toca tu moto sin autorización, te enterás al instante, estés donde estés.</p>
-                    <div class="hero-actions">
-                        <button id="landing-btn-cta" class="btn-landing-primary btn-landing-lg">Crear cuenta gratis</button>
-                        <a href="#como-funciona" class="landing-link-secondary">Ver cómo funciona</a>
-                    </div>
-                </div>
-                <div class="hero-diagram"><svg viewBox="0 0 560 456" role="img" aria-label="Diagrama: el ESP32 conecta el sensor de vibración, el acelerómetro, el GPS, la celda de carga y el módulo celular">
-<defs><path id="t1" d="M90 130V210H200"/><path id="t2" d="M90 330V250H200"/><path id="t3" d="M470 130V210H360"/><path id="t4" d="M470 330V250H360"/><path id="t5" d="M280 130V170"/></defs>
-<g class="trace"><use href="#t1"/><use href="#t2"/><use href="#t3"/><use href="#t4"/><use href="#t5"/></g>
-<g class="flow"><use href="#t1"/><use href="#t2"/><use href="#t3"/><use href="#t4"/><use href="#t5"/></g>
-<circle class="ping" cx="470" cy="85" r="34"/>
-<use href="#s-sw420" x="30" y="40" width="120" height="90"/><use href="#s-sim" x="220" y="40" width="120" height="90"/><use href="#s-gps" x="410" y="40" width="120" height="90"/>
-<use href="#s-esp32" x="200" y="170" width="160" height="120"/>
-<use href="#s-mpu" x="30" y="330" width="120" height="90"/><use href="#s-hx711" x="410" y="330" width="120" height="90"/>
-<g class="diagram-label" text-anchor="middle"><text x="90" y="30">Vibración</text><text x="280" y="30">Red celular</text><text x="470" y="30">GPS</text><text x="90" y="442">Movimiento</text><text x="470" y="442">Peso</text></g>
-</svg></div>
-            </header>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="site-shell">
+  <div class="landing-top">
+    <nav class="landing-nav" aria-label="Navegación principal">
+      <a class="landing-brand brand-link" href="#inicio" aria-label="MotoGuard — Inicio"><span class="brand-logo-frame"><img src="./img/motoguard-simbolo.png" width="44" height="44" alt="" decoding="async"></span><span class="landing-brand-name">MotoGuard</span><span class="brand-tag">PROTOTIPO</span></a>
+      <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Mostrar menú"><span></span><span></span><span></span></button>
+      <div class="landing-nav-links" id="nav-links">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#hardware">Tecnología</a>
+        <a href="#desarrollo">Desarrollo</a>
+        <a href="#descargar">Descargas</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <a class="btn-landing-primary nav-download" href="#descargar">Obtener la app <span aria-hidden="true">↗</span></a>
+    </nav>
+    <header class="landing-hero" id="inicio">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> SEGURIDAD CONECTADA · PROYECTO MOTOGUARD</div>
+        <h1>Más control.<br><span class="accent-text">Más tranquilidad.</span><br>Para tu moto.</h1>
+        <p>MotoGuard es un prototipo de seguridad para motocicletas que detecta vibraciones y movimientos, registra alertas y permite activar la protección a distancia desde el celular.</p>
+        <div class="hero-actions"><a class="btn-landing-primary btn-landing-lg" href="#descargar">Descargar aplicación <span aria-hidden="true">↗</span></a><a class="landing-link-secondary" href="#como-funciona">Conocer el sistema ↓</a></div>
+        <div class="hero-note"><span class="hero-note-icon">✓</span> ESP32 + SW-420 + MPU6050 + nube + aplicación móvil</div>
+      </div>
+      <div class="hero-visual hero-visual-logo" aria-label="Logo oficial del proyecto MotoGuard">
+        <div class="visual-label"><span class="visual-live"></span> MOTOGUARD · IDENTIDAD DEL PROYECTO</div>
+        <div class="hero-logo-stage">
+          <div class="hero-logo-orbit orbit-one" aria-hidden="true"></div>
+          <div class="hero-logo-orbit orbit-two" aria-hidden="true"></div>
+          <div class="hero-logo-paper">
+            <img class="hero-main-logo" src="./img/motoguard-logo.png" width="516" height="484" alt="Logo MotoGuard: moto roja, escudo azul y rojo, y el lema Sistema de Seguridad Inteligente" fetchpriority="high">
+          </div>
         </div>
+        <div class="hero-identity-bottom"><span><span class="mini-dot" aria-hidden="true"></span> PROTOTIPO EN DESARROLLO</span><span>ESP32 · APP MÓVIL · NUBE</span></div>
+      </div>
+    </header>
+  </div>
 
-        <section class="landing-problem">
-            <div class="problem-inner">
-                <div class="problem-text">
-                    <h2>El problema es más grande de lo que parece</h2>
-                    <p>El robo de motos en Argentina no para de crecer: se duplicó en los últimos dos años y hoy es una de las modalidades delictivas que más aumenta en todo el país. Una moto estacionada en la calle, sin vigilancia activa, es un blanco fácil, y para cuando el dueño se da cuenta, ya es tarde.</p>
-                </div>
-                <div class="problem-stats">
-                    <div class="stat-card">
-                        <span class="stat-number" data-target="44" data-suffix="%">0%</span>
-                        <span class="stat-label">de todos los robos de vehículos denunciados en el país son motos</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" data-target="6" data-suffix=" min">0 min</span>
-                        <span class="stat-label">es el intervalo promedio entre cada robo de vehículo en Argentina</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" data-target="2" data-suffix="x">0x</span>
-                        <span class="stat-label">se duplicaron los robos de motos denunciados en los últimos dos años</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <main id="contenido">
+    <section class="intro-band" aria-label="Capacidades comprobadas">
+      <div class="intro-band-inner">
+        <div><span class="intro-icon">◉</span><strong>Detección real</strong><small>Vibración y movimiento</small></div>
+        <div><span class="intro-icon">⌁</span><strong>Conectado a la nube</strong><small>ESP32 → Render → Firebase</small></div>
+        <div><span class="intro-icon">◇</span><strong>Control remoto</strong><small>Activación desde la app</small></div>
+        <div><span class="intro-icon">▣</span><strong>Historial</strong><small>Registro de alertas</small></div>
+      </div>
+    </section>
 
-        <section id="como-funciona" class="landing-section">
-            <h2>Cómo funciona</h2>
-            <ol class="landing-steps">
-                <li><span class="step-index">1</span><h3>Instalás el dispositivo</h3><p>Un módulo con GPS, sensor de movimiento y conexión a internet, montado en la moto, con un código de serie único de fábrica.</p></li>
-                <li><span class="step-index">2</span><h3>Vinculás tu cuenta</h3><p>Creás tu cuenta, ingresás el código de tu dispositivo y queda vinculado solo a vos. Nadie más puede verlo ni controlarlo.</p></li>
-                <li><span class="step-index">3</span><h3>El sistema vigila en segundo plano</h3><p>Mientras está armado, los sensores monitorean vibración y posición constantemente, sin que tengas que hacer nada.</p></li>
-                <li><span class="step-index">4</span><h3>Recibís alertas al instante</h3><p>Si alguien mueve tu moto sin autorización, te llega un aviso al toque por Telegram, con la ubicación exacta en el mapa.</p></li>
-            </ol>
-        </section>
+    <section class="section-inner section-pad" id="como-funciona">
+      <div class="section-heading"><p class="section-kicker">CÓMO FUNCIONA</p><h2>La protección comienza antes de que sea tarde.</h2><p>El sistema combina hardware instalado en el prototipo y servicios en la nube para registrar actividad y mantener informado al usuario.</p></div>
+      <ol class="landing-steps modern-steps">
+        <li><span class="step-index">01 /</span><h3>Conectás MotoGuard</h3><p>El ESP32 se conecta a una red Wi-Fi con acceso a internet y envía lecturas del prototipo.</p></li>
+        <li><span class="step-index">02 /</span><h3>Activás la protección</h3><p>Desde la aplicación podés activar o desactivar la vigilancia del dispositivo vinculado.</p></li>
+        <li><span class="step-index">03 /</span><h3>Los sensores detectan</h3><p>El SW-420 registra vibraciones y el MPU6050 identifica movimientos. Cada uno puede activar una alerta.</p></li>
+        <li><span class="step-index">04 /</span><h3>Consultás las alertas</h3><p>Render actualiza Firebase y la aplicación muestra el estado y el historial de eventos.</p></li>
+      </ol>
+    </section>
 
-        <section id="hardware" class="landing-sensors">
-            <div class="sensors-header">
-                <h2>El hardware, sensor por sensor</h2>
-                <p>MotoGuard no es una sola pieza. Es un conjunto de sensores que trabajan juntos, coordinados por un microcontrolador conectado a internet.</p>
-            </div>
-            <div class="sensors-grid">
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Módulo sensor de vibración SW420"><use href="#s-sw420"/></svg></div>
-                    <h3>Sensor de vibración (SW420)</h3>
-                    <p class="sensor-role">Primera línea de detección</p>
-                    <p>Detecta cualquier golpe o vibración sobre la moto y dispara al instante una interrupción en el microcontrolador. Es lo primero que "despierta" al sistema cuando algo toca la moto.</p>
-                </article>
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Módulo acelerómetro MPU6050"><use href="#s-mpu"/></svg></div>
-                    <h3>Acelerómetro y giroscopio (MPU6050)</h3>
-                    <p class="sensor-role">Confirmación de movimiento real</p>
-                    <p>Una vez que el SW420 detecta algo, el MPU6050 mide la inclinación y el movimiento real de la moto para distinguir un golpe casual, como alguien que pasa cerca o viento fuerte, de que efectivamente la estén moviendo o levantando.</p>
-                </article>
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Módulo GPS NEO-6M"><use href="#s-gps"/></svg></div>
-                    <h3>Módulo GPS (NEO-6M)</h3>
-                    <p class="sensor-role">Ubicación en todo momento</p>
-                    <p>Calcula la posición exacta de la moto mediante satélites y la envía en tiempo real. Es lo que alimenta el mapa en vivo de tu cuenta y lo que te permite encontrar la moto si se la llevan.</p>
-                </article>
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Celda de carga con amplificador HX711"><use href="#s-hx711"/></svg></div>
-                    <h3>Celda de carga + HX711</h3>
-                    <p class="sensor-role">Verificación por peso</p>
-                    <p>Instalada en el asiento, mide el peso de quien se sube y lo compara con el rango que configuraste. Si no coincide, el sistema puede negar el arranque del motor.</p>
-                </article>
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Microcontrolador ESP32"><use href="#s-esp32"/></svg></div>
-                    <h3>Microcontrolador ESP32</h3>
-                    <p class="sensor-role">El cerebro que conecta todo</p>
-                    <p>Lee los sensores, decide si hay una alerta real y se conecta a internet para avisar a tu cuenta y mandar el aviso por Telegram. Es la pieza que une el hardware con la nube.</p>
-                </article>
-                <article class="sensor-card">
-                    <div class="sensor-art"><svg viewBox="0 0 120 90" role="img" aria-label="Módulo celular SIM800L"><use href="#s-sim"/></svg></div>
-                    <h3>Módulo celular (SIM800L)</h3>
-                    <p class="sensor-role">Conectividad fuera del WiFi</p>
-                    <p>Le da al sistema su propia conexión a internet, independiente de cualquier red WiFi. Clave para que siga funcionando con la moto estacionada en la calle, lejos de casa.</p>
-                </article>
-            </div>
-        </section>
+    <section id="hardware" class="landing-sensors hardware-section">
+      <div class="sensors-header"><p class="section-kicker bright">HARDWARE + SOFTWARE</p><h2>La tecnología detrás de MotoGuard.</h2><p>Un conjunto de módulos electrónicos conectados a un mismo sistema. Cada elemento tiene una función específica.</p></div>
+      <div class="sensors-grid">
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-sw420"/></svg></div><div class="card-meta"><span class="state-pill active">PROBADO</span></div><h3>Sensor SW-420</h3><p class="sensor-role">Detección de vibraciones</p><p>Registra golpes o vibraciones y los reporta al ESP32 para generar una alerta cuando la protección está activada.</p></article>
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-mpu"/></svg></div><div class="card-meta"><span class="state-pill active">PROBADO</span></div><h3>MPU6050</h3><p class="sensor-role">Detección de movimiento</p><p>El acelerómetro mide cambios de movimiento y permite activar una alerta aun cuando no se detecte vibración.</p></article>
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-esp32"/></svg></div><div class="card-meta"><span class="state-pill active">PROBADO</span></div><h3>ESP32</h3><p class="sensor-role">Controlador principal</p><p>Recopila las lecturas y las transmite mediante Wi-Fi y HTTPS a una API Node.js alojada en Render.</p></article>
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-gps"/></svg></div><div class="card-meta"><span class="state-pill developing">EN PRUEBAS</span></div><h3>GPS NEO-6M</h3><p class="sensor-role">Ubicación satelital</p><p>Está integrado al prototipo y pendiente de obtener una posición válida en las pruebas de exterior.</p></article>
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-hx711"/></svg></div><div class="card-meta"><span class="state-pill developing">EN DESARROLLO</span></div><h3>Celda de carga + HX711</h3><p class="sensor-role">Verificación por peso</p><p>Etapa proyectada para reconocer si el peso sobre el asiento coincide con un rango autorizado.</p></article>
+        <article class="sensor-card"><div class="sensor-art"><svg viewBox="0 0 120 90" aria-hidden="true"><use href="#s-sim"/></svg></div><div class="card-meta"><span class="state-pill developing">PENDIENTE</span></div><h3>Conectividad celular</h3><p class="sensor-role">Acceso fuera de Wi-Fi</p><p>Se está evaluando el SIM800L para mantener la comunicación cuando la moto no tenga acceso a una red Wi-Fi.</p></article>
+      </div>
+    </section>
 
-        <section id="contacto" class="landing-contact">
-            <div class="contact-inner">
-                <div class="contact-intro">
-                    <h2>Escribinos</h2>
-                    <p>¿Tenés dudas sobre el dispositivo, querés comprar uno o necesitás ayuda con tu cuenta? Dejanos tu mensaje y te respondemos por correo.</p>
-                    <a class="contact-mail" href="mailto:motoguard2030@gmail.com">motoguard2030@gmail.com</a>
-                </div>
-                <form id="form-contact" class="contact-form" novalidate>
-                    <div class="contact-field">
-                        <label for="contact-name">Nombre</label>
-                        <input type="text" id="contact-name" name="nombre" maxlength="80" autocomplete="name" required>
-                    </div>
-                    <div class="contact-field">
-                        <label for="contact-email">Correo electrónico</label>
-                        <input type="email" id="contact-email" name="email" maxlength="120" autocomplete="email" required>
-                    </div>
-                    <div class="contact-field">
-                        <label for="contact-message">Mensaje</label>
-                        <textarea id="contact-message" name="mensaje" rows="5" minlength="10" maxlength="2000" required></textarea>
-                    </div>
-                    <input type="text" name="_honey" class="contact-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <button type="submit" id="contact-submit" class="btn-landing-primary btn-landing-lg">Enviar mensaje</button>
-                    <p id="contact-status" class="contact-status" role="status" aria-live="polite"></p>
-                </form>
-            </div>
-        </section>
+    <section class="section-inner section-pad architecture-section" id="desarrollo">
+      <div class="architecture-copy"><p class="section-kicker">ARQUITECTURA</p><h2>Del movimiento a tu teléfono.</h2><p>MotoGuard separa la electrónica, el servidor y la aplicación para facilitar el mantenimiento y permitir el acceso remoto por internet.</p><div class="architecture-features"><div><span>01</span><p><strong>ESP32</strong><small>Lee los sensores y envía datos mediante HTTPS.</small></p></div><div><span>02</span><p><strong>Render + Node.js</strong><small>Valida la clave del dispositivo y procesa las alertas.</small></p></div><div><span>03</span><p><strong>Firebase</strong><small>Gestiona usuarios, estados y registros en tiempo real.</small></p></div><div><span>04</span><p><strong>React Native</strong><small>Permite consultar y cambiar la protección en el celular.</small></p></div></div></div>
+      <div class="architecture-visual" aria-label="Flujo del sistema"><div class="arch-step"><span class="arch-tag">HARDWARE</span><strong>ESP32 + Sensores</strong><small>SW-420 · MPU6050 · GPS*</small></div><div class="arch-arrow">↓ <span>HTTPS</span></div><div class="arch-step"><span class="arch-tag">SERVIDOR</span><strong>API Node.js</strong><small>Render · Autenticación del dispositivo</small></div><div class="arch-arrow">↓ <span>ACTUALIZACIÓN</span></div><div class="arch-step"><span class="arch-tag">BASE DE DATOS</span><strong>Firebase</strong><small>Estado · Protección · Historial</small></div><div class="arch-arrow">↕ <span>TIEMPO REAL</span></div><div class="arch-step arch-last"><span class="arch-tag">APLICACIÓN</span><strong>MotoGuard</strong><small>Android · iOS en desarrollo</small></div></div>
+    </section>
 
-        <footer class="landing-footer">
-            <div>
-                <p class="landing-footer-brand">MotoGuard</p>
-                <p class="landing-footer-sub">Seguridad activa para motos, pensada para el problema real del robo en la calle.</p>
-            </div>
-            <button id="landing-btn-cta-footer" class="btn-landing-primary">Crear cuenta</button>
-        </footer>
-    </div>
+    <section class="app-section" id="aplicacion"><div class="app-section-inner">
+      <div class="app-text"><p class="section-kicker bright">APP MÓVIL</p><h2>Tu sistema. En la palma de tu mano.</h2><p>Desde MotoGuard podés iniciar sesión, vincular tu dispositivo, activar o desactivar la protección y consultar el historial de alertas. La app Android ya tiene una compilación APK de prueba.</p><div class="feature-chips"><span>✓ Inicio de sesión</span><span>✓ Estado del dispositivo</span><span>✓ Activar / desactivar</span><span>✓ Alertas e historial</span></div><a class="btn-landing-primary btn-landing-lg" href="#descargar">Ver descarga disponible ↗</a></div>
+      <div class="app-preview" aria-label="Vista conceptual de las funciones de la aplicación; no es una captura real"><div class="preview-screen"><div class="preview-top"><span>MOTOGUARD</span><span>● VISTA ILUSTRATIVA</span></div><div class="preview-hero"><div class="shield-shape">◈</div><span>PROTECCIÓN DEL DISPOSITIVO</span><strong>Monitoreo remoto</strong><small>Estado y controles en la aplicación</small></div><div class="preview-list"><div><span>Detección de vibración</span><b>SW-420</b></div><div><span>Detección de movimiento</span><b>MPU6050</b></div><div><span>Alertas registradas</span><b>Firebase</b></div></div><div class="preview-footnote">Diseño ilustrativo · no refleja datos en vivo</div></div></div>
+    </div></section>
 
-    <!-- PANTALLA DE LOGIN -->
-    <div id="screen-login" class="auth-wrapper hidden">
-        <div class="auth-card">
-            <div class="brand">
-                <span class="brand-dot"></span>
-                <span class="brand-name">MotoGuard</span>
-            </div>
-            <a href="#" id="link-back-to-landing-login" class="landing-back-link">‹ Volver al inicio</a>
-            <h2>Iniciar Sesión</h2>
-            <form id="form-login">
-                <div class="form-group">
-                    <label for="login-email">Correo Electrónico</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Contraseña</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
-            </form>
-            <div class="auth-footer">
-                ¿No tienes cuenta? <a href="#" id="link-to-register">Regístrate aquí</a>
-            </div>
-        </div>
-    </div>
+    <section class="section-inner download-section section-pad" id="descargar">
+      <div class="section-heading"><p class="section-kicker">DESCARGAS</p><h2>MotoGuard, también en tu celular.</h2><p>Probá la aplicación independiente en Android. Para iPhone seguimos utilizando Expo Go durante el desarrollo.</p></div>
+      <div class="download-grid"><article class="download-card preferred"><div class="download-top"><span class="download-platform" aria-hidden="true">↧</span><span class="state-pill active">APK DE PRUEBA</span></div><h3>MotoGuard para Android</h3><p>Versión 1.0.0 · Compilada con Expo EAS. No requiere Expo Go una vez instalada.</p><a class="download-primary" href="https://expo.dev/artifacts/eas/6znTDqNRYQ_98C2HCndiHaXNecXkZLtGoYo8a4uTs54.apk" target="_blank" rel="noopener noreferrer" data-apk-link>Descargar APK de prueba <span aria-hidden="true">↗</span></a><p class="download-warning">Enlace temporal de Expo: puede caducar. Antes de difundir la web, publicá el APK en una versión de GitHub Releases y actualizá el enlace.</p></article>
+      <article class="download-card"><div class="download-top"><span class="download-platform apple-mark" aria-hidden="true"></span><span class="state-pill developing">PRÓXIMAMENTE</span></div><h3>MotoGuard para iPhone</h3><p>La versión iOS se prueba actualmente mediante Expo Go. Todavía no existe una descarga independiente para iPhone.</p><p class="ios-hint">La distribución futura requerirá TestFlight o App Store; un archivo APK no funciona en iOS.</p></article></div>
+      <p class="download-detail"><strong>Nota de instalación:</strong> descargá el APK solamente de enlaces oficiales del proyecto. En Android puede ser necesario autorizar temporalmente la instalación desde el navegador o administrador de archivos.</p>
+    </section>
 
-    <!-- PANTALLA DE REGISTRO -->
-    <div id="screen-register" class="auth-wrapper hidden">
-        <div class="auth-card">
-            <div class="brand">
-                <span class="brand-dot"></span>
-                <span class="brand-name">MotoGuard</span>
-            </div>
-            <a href="#" id="link-back-to-landing-register" class="landing-back-link">‹ Volver al inicio</a>
-            <h2>Crear Cuenta</h2>
-            <form id="form-register">
-                <div class="form-group">
-                    <label for="reg-name">Nombre Completo</label>
-                    <input type="text" id="reg-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-email">Correo Electrónico</label>
-                    <input type="email" id="reg-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-password">Contraseña</label>
-                    <input type="password" id="reg-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-codigo">Código de la Moto</label>
-                    <input type="text" id="reg-codigo" placeholder="MG-0000" maxlength="7" required>
-                    <small id="reg-codigo-hint" class="field-hint">Formato: MG- seguido de 4 números (ej: MG-0007). Es el código impreso en tu dispositivo.</small>
-                </div>
-                <div class="form-group">
-                    <label for="reg-pin">PIN de Activación</label>
-                    <input type="text" id="reg-pin" placeholder="Ej: 7K2P9QXZ" maxlength="10" required>
-                    <small class="field-hint">Viene en una etiqueta dentro del dispositivo (no en la carcasa exterior). Solo quien lo tiene en la mano puede verlo.</small>
-                </div>
-                <div class="form-group">
-                    <label for="reg-weight">Peso Base del Conductor (kg)</label>
-                    <input type="number" id="reg-weight" step="0.1" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Crear cuenta</button>
-            </form>
-            <div class="auth-footer">
-                ¿Ya tienes cuenta? <a href="#" id="link-to-login">Inicia sesión</a>
-            </div>
-        </div>
-    </div>
+    <section class="faq-section"><div class="section-inner section-pad"><div class="section-heading"><p class="section-kicker">PREGUNTAS FRECUENTES</p><h2>Lo esencial, explicado simple.</h2></div><div class="faq-list"><details><summary>¿MotoGuard funciona sin tener una computadora encendida?</summary><p>Sí. El backend está publicado en Render y la app utiliza Firebase. El ESP32 necesita alimentación y conexión a internet para enviar información.</p></details><details><summary>¿Funciona si la moto está lejos del Wi-Fi?</summary><p>La versión actual del prototipo requiere Wi-Fi para enviar datos. La conectividad celular todavía está en desarrollo.</p></details><details><summary>¿La ubicación GPS ya funciona en cualquier lugar?</summary><p>La comunicación con el módulo GPS está integrada, pero todavía debemos completar las pruebas de recepción satelital y ubicación válida.</p></details><details><summary>¿Se puede instalar en iPhone?</summary><p>La aplicación se prueba en iPhone mediante Expo Go. La versión independiente para iOS todavía no está publicada.</p></details><details><summary>¿Es un sistema antirrobo listo para comercializar?</summary><p>No. Es un prototipo en desarrollo y evaluación. No reemplaza un dispositivo de seguridad automotriz certificado ni garantiza impedir un robo.</p></details></div></div></section>
 
-    <!-- PANTALLA DASHBOARD -->
-    <div id="screen-dashboard" class="dashboard-wrapper hidden">
-        <nav class="navbar">
-            <div class="brand">
-                <span class="brand-dot"></span>
-                <span class="brand-name">MotoGuard</span>
-            </div>
-            <div class="nav-user">
-                <span id="status-badge" class="badge badge-green">Armado</span>
-                <span id="device-badge" class="badge badge-blue"></span>
-                <span>Hola, <span id="user-display-name">Usuario</span></span>
-                <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
-            </div>
-        </nav>
-
-        <div class="dashboard-container">
-            <div id="alert-banner" class="alert-banner hidden" role="alert"></div>
-            <div class="dashboard-grid">
-                <!-- Tarjeta 1: Estado del Sistema (armado/desarmado) -->
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Estado del Sistema</span>
-                    </div>
-                    <ul class="status-list">
-                        <li>
-                            <span>Estado actual:</span>
-                            <span id="relay-status-text" class="text-green">Activado</span>
-                        </li>
-                    </ul>
-                    <div class="btn-group">
-                        <button id="btn-lock" class="btn btn-danger">Desactivar Sistema</button>
-                        <button id="btn-unlock" class="btn btn-primary">Activar Sistema</button>
-                    </div>
-                    <button id="btn-calibrar" class="btn btn-outline btn-full mt-sm">Calibrar posición de estacionamiento</button>
-                </div>
-
-                <!-- Tarjeta 2: Mapa -->
-                <div class="card card-map">
-                    <div class="card-header">
-                        <span class="card-title">Ubicación en Tiempo Real</span>
-                    </div>
-                    <div id="map" class="map-container"></div>
-                    <div class="map-overlay" id="coords-display">Cargando GPS...</div>
-                </div>
-
-                <!-- Tarjeta 3: Validación Biométrica -->
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Validación Biométrica</span>
-                    </div>
-                    <div class="slider-group">
-                        <label for="slider-weight">Peso Autorizado: <span id="lbl-weight">75</span> kg</label>
-                        <input type="range" id="slider-weight" min="40" max="120" step="0.5" value="75">
-                    </div>
-                    <div class="slider-group">
-                        <label for="slider-tolerance">Tolerancia (+/-): <span id="lbl-tolerance">3</span> kg</label>
-                        <input type="range" id="slider-tolerance" min="1" max="10" step="0.5" value="3">
-                    </div>
-                    <div class="biometric-box">
-                        <div class="bio-label">Rango actual aceptado por el sensor:</div>
-                        <div class="bio-range"><span id="bio-min">72.0</span> kg - <span id="bio-max">78.0</span> kg</div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta 4: Historial de alertas -->
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Historial de Alertas</span>
-                    </div>
-                    <ul id="lista-historial" class="alerts-list">
-                        <li class="alert-item"><span>Todavía no hay eventos registrados.</span></li>
-                    </ul>
-                </div>
-
-                <!-- Tarjeta 5: Vincular Telegram -->
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Notificaciones por Telegram</span>
-                    </div>
-                    <p class="card-text">
-                        Recibí un aviso instantáneo en tu celular cuando detectemos movimiento sospechoso, aunque tengas esta página cerrada.
-                    </p>
-                    <button id="btn-vincular-telegram" class="btn btn-primary btn-full">Vincular Telegram</button>
-                </div>
-
-                <!-- Tarjeta 6: Gestionar dispositivo -->
-                <div class="card">
-                    <div class="card-header">
-                        <span class="card-title">Mi Dispositivo</span>
-                    </div>
-                    <p class="card-text">
-                        Código vinculado: <b id="device-code-display">Sin vincular</b>
-                    </p>
-                    <button id="btn-desvincular" class="btn btn-outline btn-full mt-sm">Olvidar este dispositivo</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="module" src="assets/js/main.js"></script>
+    <section class="contact-cta" id="contacto"><div class="contact-cta-inner"><div><p class="section-kicker bright">CONTACTO</p><h2>¿Querés conocer más sobre el proyecto?</h2><p>Si tenés preguntas sobre MotoGuard, el prototipo o su desarrollo, escribinos.</p></div><a class="btn-landing-primary btn-landing-lg" href="mailto:motoguard2030@gmail.com?subject=Consulta%20sobre%20MotoGuard">Enviar correo ↗</a></div></section>
+  </main>
+  <footer class="site-footer"><div class="footer-wrap"><a class="footer-brand" href="#inicio"><span class="brand-logo-frame"><img src="./img/motoguard-simbolo.png" width="36" height="36" alt="" loading="lazy"></span> MotoGuard</a><p>Prototipo educativo de protección y monitoreo remoto para motocicletas.</p><div><a href="#hardware">Tecnología</a><a href="#descargar">Descargas</a><a href="#contacto">Contacto</a></div><small>© 2026 MotoGuard · Proyecto en desarrollo</small></div></footer>
+</div>
 </body>
 </html>
