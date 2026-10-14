@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { get, ref } from 'firebase/database';
+import { get, ref, set } from 'firebase/database';
 import { signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from './firebase';
@@ -24,6 +24,15 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
   const [tab,setTab]=useState<Screen>('inicio');
   const [codeInput,setCodeInput]=useState('');
   const [linkBusy,setLinkBusy]=useState(false);
+  const [changingProtection,setChangingProtection]=useState(false);
+  const [clock,setClock]=useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setClock(Date.now()), 5000);
+    return () => clearInterval(id);
+  }, []);
+  const lastContact = Number(device?.ultimaConexion);
+  const online = !preview && Number.isFinite(lastContact) && lastContact > 0 && clock-lastContact < 20000;
+
   const lat = validCoordinate(device?.lat ?? device?.latitud, -90, 90);
   const lng = validCoordinate(device?.lng ?? device?.longitud, -180, 180);
   const hasLocation = lat!==null && lng!==null && !(lat===0 && lng===0);
@@ -65,6 +74,34 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
     } finally {setLinkBusy(false);}
   }
 
+  function requestProtectionChange() {
+    if (!device || !uid || !deviceCode || preview || !db) return;
+    if (!active && !online) {
+      Alert.alert('Dispositivo desconectado', 'No podemos confirmar que el ESP32 reciba o aplique el cambio. Esperá a que vuelva a conectarse.');
+      return;
+    }
+    const next = !active;
+    Alert.alert(
+      next ? 'Activar protección' : 'Desactivar protección',
+      next ? `¿Querés activar la vigilancia de ${deviceCode}? Las vibraciones podrán generar alertas.` : '¿Querés desactivar las alertas de movimiento de este dispositivo?',
+      [
+        {text:'Cancelar', style:'cancel'},
+        {text:next ? 'Activar' : 'Desactivar', onPress:async()=>{
+          try {
+            setChangingProtection(true);
+            if (auth?.currentUser?.uid !== uid) throw new Error('Sesión no válida');
+            // Las reglas solo permiten cambiar el campo booleano activo si sos propietario.
+            await set(ref(db, `MotoGuard/dispositivos/${deviceCode}/activo`), next);
+          } catch (error) {
+            Alert.alert('No se pudo cambiar', 'Revisá tu conexión y las reglas de seguridad de Firebase.');
+          } finally {
+            setChangingProtection(false);
+          }
+        }}
+      ]
+    );
+  }
+
   async function openMaps() {
     if (!hasLocation) return Alert.alert('Ubicación no disponible','El ESP32 aún no envió coordenadas válidas.');
     const url=`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -86,13 +123,27 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
           <Text style={styles.sectionTitle}>Panel de seguridad</Text>
           <View style={[styles.hero,{borderColor:alarm?'#8D4357':colors.stroke}]}>
             <View style={[styles.heroIcon,{backgroundColor:alarm?'#52243B':'#143E49'}]}><Ionicons name={alarm?'warning-outline':'shield-checkmark-outline'} size={37} color={alarm?colors.red:colors.cyan}/></View>
-            <Text style={styles.heroLabel}>{alarm?'ALERTA DE SEGURIDAD':active?'PROTECCIÓN ACTIVADA':'ESTADO DEL SISTEMA'}</Text>
-            <Text style={styles.heroStatus}>{preview?'Vista de ejemplo':state}</Text>
+            <Text style={styles.heroLabel}>{alarm?'ALERTA DE SEGURIDAD':active?'PROTECCIÓN ACTIVADA':'PROTECCIÓN DESACTIVADA'}</Text>
+            <Text style={styles.heroStatus}>{preview?'Vista de ejemplo':!device?'SIN DISPOSITIVO':!online?'SIN CONEXIÓN':state}</Text>
             <Text style={styles.heroDetail}>{deviceCode?`Dispositivo: ${deviceCode}`:'No hay dispositivo vinculado'}</Text>
             <View style={styles.statRow}>
-              <View style={styles.mini}><Ionicons name="pulse-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>Sensores</Text><Text style={styles.miniValue}>{device?'Con datos':'Sin datos'}</Text></View>
+              <View style={styles.mini}><Ionicons name="pulse-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>Dispositivo</Text><Text style={styles.miniValue}>{online?'En línea':'Sin conexión'}</Text></View>
               <View style={styles.mini}><Ionicons name="location-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>GPS</Text><Text style={styles.miniValue}>{hasLocation?'Disponible':'Sin ubicación'}</Text></View>
             </View>
+          </View>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>CONTROL DE PROTECCIÓN</Text>
+            <Text style={styles.cardValue}>{active ? 'Alarma activada' : 'Alarma desactivada'}</Text>
+            <Text style={styles.subtitle}>{online ? 'ESP32 conectado · Actualización automática' : 'ESP32 sin comunicación reciente. No se puede confirmar la protección.'}</Text>
+            <Button
+              text={active ? 'Desactivar protección' : 'Activar protección'}
+              icon={active ? 'lock-open-outline' : 'lock-closed-outline'}
+              variant={active ? 'secondary' : 'primary'}
+              loading={changingProtection}
+              disabled={!device || !uid || preview || changingProtection || (!active && !online)}
+              onPress={requestProtectionChange}
+            />
+            <Text style={styles.subtitle}>El cambio se guarda en Firebase y solo funciona para la cuenta propietaria. No controla el encendido de la moto.</Text>
           </View>
           <Text style={styles.sectionTitle}>Accesos rápidos</Text>
           <View style={styles.actions}>
