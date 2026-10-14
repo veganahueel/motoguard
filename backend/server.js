@@ -88,7 +88,7 @@ function keyMatches(received) {
 }
 
 // Alerta independiente del ciclo HTTPS del ESP32. Nunca mostramos tokens en logs.
-async function notificarTelegramSiCorresponde(ref, motivo, grados, lat, lng) {
+async function notificarTelegramSiCorresponde(ref, motivo, grados, lat, lng, fuenteUbicacion) {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
 
   // Reserva persistida en Firebase: reduce duplicados incluso si Render reinicia.
@@ -105,7 +105,7 @@ async function notificarTelegramSiCorresponde(ref, motivo, grados, lat, lng) {
   texto += `Motivo: ${motivo.replace(/_/g, ' ')}\nProteccion: ACTIVADA`;
   if (Number.isFinite(grados)) texto += `\nCambio de inclinacion: ${grados.toFixed(1)}°`;
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    texto += `\nUbicacion: https://maps.google.com/?q=${lat},${lng}`;
+    texto += `\nUbicacion ${fuenteUbicacion === 'MANUAL' ? '(manual, NO GPS en vivo)' : '(GPS)'}: https://maps.google.com/?q=${lat},${lng}`;
   }
 
   // Node 18+ ofrece fetch nativo.
@@ -173,7 +173,7 @@ app.post('/api/dispositivo', async (req, res) => {
   if (!keyMatches(req.get('x-device-key'))) {
     return res.status(401).json({ error: 'Dispositivo no autorizado' });
   }
-  const { vibracion, movimiento, lat, lng, calibracion, inclinacionGrados } = req.body || {};
+  const { vibracion, movimiento, lat, lng, calibracion, inclinacionGrados, pesoKg, pesoValido, hx711Raw, fuenteUbicacion, gpsSatelites } = req.body || {};
   if (typeof vibracion !== 'boolean' || typeof movimiento !== 'boolean') {
     return res.status(400).json({ error: 'vibracion y movimiento deben ser booleanos' });
   }
@@ -183,6 +183,26 @@ app.post('/api/dispositivo', async (req, res) => {
       (hasLat && (!Number.isFinite(lat) || !Number.isFinite(lng) ||
        lat < -90 || lat > 90 || lng < -180 || lng > 180))) {
     return res.status(400).json({ error: 'Coordenadas invalidas' });
+  }
+  // Telemetria opcional enviada por el firmware actualizado.
+  if (fuenteUbicacion !== undefined &&
+      (!hasLat || !hasLng || !['GPS', 'MANUAL'].includes(fuenteUbicacion))) {
+    return res.status(400).json({ error: 'Origen de ubicacion invalido' });
+  }
+  if (gpsSatelites !== undefined &&
+      (!Number.isInteger(gpsSatelites) || gpsSatelites < 0 || gpsSatelites > 64)) {
+    return res.status(400).json({ error: 'Numero de satelites invalido' });
+  }
+  if (pesoValido !== undefined && typeof pesoValido !== 'boolean') {
+    return res.status(400).json({ error: 'pesoValido debe ser booleano' });
+  }
+  if (pesoKg !== undefined &&
+      (!Number.isFinite(pesoKg) || pesoKg < 0 || pesoKg > 20)) {
+    return res.status(400).json({ error: 'Peso fuera del rango de la celda de 20 kg' });
+  }
+  if (hx711Raw !== undefined &&
+      (!Number.isSafeInteger(hx711Raw) || hx711Raw < -8388608 || hx711Raw > 8388607)) {
+    return res.status(400).json({ error: 'Lectura RAW invalida' });
   }
   if (inclinacionGrados !== undefined &&
       (!Number.isFinite(inclinacionGrados) || inclinacionGrados < 0 || inclinacionGrados > 180)) {
@@ -213,10 +233,18 @@ app.post('/api/dispositivo', async (req, res) => {
       'sensores/movimiento': movimiento,
     };
     if (inclinacionGrados !== undefined) updates['sensores/inclinacionGrados'] = inclinacionGrados;
+    if (gpsSatelites !== undefined) updates['sensores/gpsSatelites'] = gpsSatelites;
+    if (pesoValido !== undefined) {
+      updates['sensores/pesoValido'] = pesoValido;
+      updates['sensores/pesoEstimado'] = true; // Factor HX711 aun no calibrado definitivamente.
+      updates['sensores/pesoKg'] = pesoValido && pesoKg !== undefined ? pesoKg : null;
+    }
+    if (hx711Raw !== undefined) updates['sensores/hx711Raw'] = hx711Raw;
     if (hasLat && hasLng) {
       updates.lat = lat;
       updates.lng = lng;
       updates.ultimaUbicacion = now;
+      updates.fuenteUbicacion = fuenteUbicacion || 'DESCONOCIDA';
     }
 
     if (pendiente && calibracion?.solicitudId === anterior.calibracion.solicitudId) {
@@ -248,7 +276,7 @@ app.post('/api/dispositivo', async (req, res) => {
     if (alerta && anterior.estado !== 'ALERTA') {
       await ref.child('historial').push({ estado: 'ALERTA', motivo, timestamp: now });
       // Telegram es opcional y no puede romper el endpoint del ESP32.
-      void notificarTelegramSiCorresponde(ref, motivo, inclinacionGrados, hasLat ? lat : null, hasLng ? lng : null)
+      void notificarTelegramSiCorresponde(ref, motivo, inclinacionGrados, hasLat ? lat : null, hasLng ? lng : null, fuenteUbicacion)
         .catch(error => console.error('Telegram: no se pudo enviar alerta:', error.message));
     }
 

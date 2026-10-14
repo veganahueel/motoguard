@@ -37,6 +37,12 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
   const lat = validCoordinate(device?.lat ?? device?.latitud, -90, 90);
   const lng = validCoordinate(device?.lng ?? device?.longitud, -180, 180);
   const hasLocation = lat!==null && lng!==null && !(lat===0 && lng===0);
+  const origenGPS = device?.fuenteUbicacion === 'GPS';
+  const origenManual = device?.fuenteUbicacion === 'MANUAL';
+  const peso = device?.sensores?.pesoKg;
+  const pesoDisponible = device?.sensores?.pesoValido === true &&
+    typeof peso === 'number' && Number.isFinite(peso) && peso >= 0 && peso <= 20;
+  const pesoTexto = pesoDisponible ? `${peso!.toFixed(3)} kg` : 'Sin medir';
   const state = String(device?.estado || 'SIN DATOS').replace(/_/g,' ');
   const alarm = ['ALERTA','MOVIMIENTO CONFIRMADO','MOVIMIENTO_CONFIRMADO'].includes(String(device?.estado||'').toUpperCase());
   const active = device?.activo === true || device?.activo === 1 || device?.activo === 'true';
@@ -178,7 +184,7 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
             <Text style={styles.heroDetail}>{deviceCode?`Dispositivo: ${deviceCode}`:'No hay dispositivo vinculado'}</Text>
             <View style={styles.statRow}>
               <View style={styles.mini}><Ionicons name="pulse-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>Dispositivo</Text><Text style={styles.miniValue}>{online?'En línea':'Sin conexión'}</Text></View>
-              <View style={styles.mini}><Ionicons name="location-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>GPS</Text><Text style={styles.miniValue}>{hasLocation?'Disponible':'Sin ubicación'}</Text></View>
+              <View style={styles.mini}><Ionicons name="location-outline" size={18} color={colors.cyan}/><Text style={styles.miniLabel}>Ubicación</Text><Text style={styles.miniValue}>{hasLocation?(origenManual?'Manual':origenGPS?'GPS real':'Registrada'):'Sin ubicación'}</Text></View>
             </View>
           </View>
           <View style={styles.card}>
@@ -195,23 +201,29 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
             />
             <Text style={styles.subtitle}>{calibrationPending ? 'Dejá la moto quieta: el ESP32 debe completar la calibración antes de activar la protección.' : calibrationSaved ? 'Posición calibrada. Al volver a activar se tomará una nueva referencia.' : 'Al activar, MotoGuard solicita una calibración real del MPU6050.'} No controla el encendido de la moto.</Text>
           </View>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>CELDA DE CARGA HX711 · 20 KG</Text>
+            <Text style={styles.cardValue}>Peso estimado: {pesoTexto}</Text>
+            <Text style={styles.subtitle}>Medición experimental. El factor del HX711 todavía necesita calibración definitiva.</Text>
+            <Text style={styles.subtitle}>Validación del conductor: NO DISPONIBLE. Una celda de 20 kg no alcanza para pesar directamente a una persona adulta. No se bloquea ningún sistema de la moto.</Text>
+          </View>
           <Text style={styles.sectionTitle}>Accesos rápidos</Text>
           <View style={styles.actions}>
             <TouchableOpacity style={styles.action} onPress={()=>setTab('ubicacion')}><Ionicons name="map-outline" size={28} color={colors.cyan}/><Text style={styles.actionTitle}>Última ubicación</Text><Text style={styles.actionSub}>Ver GPS</Text></TouchableOpacity>
             <TouchableOpacity style={styles.action} onPress={()=>setTab('alertas')}><Ionicons name="notifications-outline" size={28} color={colors.orange}/><Text style={styles.actionTitle}>Alertas</Text><Text style={styles.actionSub}>Consultar eventos</Text></TouchableOpacity>
           </View>
-          <InfoBox>Este panel muestra datos reales solamente cuando un dispositivo autorizado escribe en Firebase. La app no simula coordenadas.</InfoBox>
+          <InfoBox>El sistema indica cuándo la ubicación es manual. No confundas una posición de prueba con un rastreo GPS real.</InfoBox>
         </>}
 
         {tab==='ubicacion' && <>
-          <Text style={styles.sectionTitle}>Localización GPS</Text>
+          <Text style={styles.sectionTitle}>Ubicación de MotoGuard</Text>
           <View style={styles.card}>
-            <View style={styles.mapPlaceholder}><Ionicons name="navigate-circle-outline" size={70} color={colors.cyan}/><Text style={styles.mapTitle}>{hasLocation?'Ubicación disponible':'Esperando ubicación GPS'}</Text><Text style={styles.smallCenter}>Mostramos la última coordenada guardada por el dispositivo.</Text></View>
+            <View style={styles.mapPlaceholder}><Ionicons name="navigate-circle-outline" size={70} color={colors.cyan}/><Text style={styles.mapTitle}>{hasLocation?(origenManual?'Ubicación manual de prueba':origenGPS?'GPS: posición real':'Última ubicación registrada'):'Esperando ubicación'}</Text><Text style={styles.smallCenter}>{origenManual ? 'Coordenada fija configurada manualmente. NO indica dónde está la moto ahora.' : 'Mostramos la última posición recibida del dispositivo.'}</Text></View>
             <View style={styles.coordRow}><Text style={styles.coordLabel}>LATITUD</Text><Text style={styles.coordValue}>{hasLocation?lat!.toFixed(6):'Sin datos'}</Text></View>
             <View style={styles.coordRow}><Text style={styles.coordLabel}>LONGITUD</Text><Text style={styles.coordValue}>{hasLocation?lng!.toFixed(6):'Sin datos'}</Text></View>
             <Button text="Abrir ubicación en Maps" icon="map-outline" onPress={openMaps} disabled={!hasLocation}/>
           </View>
-          <InfoBox>El GPS puede tardar en fijar coordenadas. En esta versión el mapa se abre en Google Maps; incorporaremos un mapa dentro de la app después.</InfoBox>
+          <InfoBox>{origenManual ? "Ubicación de prueba MANUAL. No corresponde a una lectura de satélites ni rastrea desplazamientos." : "El GPS NEO-6M puede tardar en fijar coordenadas. El mapa se abre en Google Maps."}</InfoBox>
         </>}
 
         {tab==='alertas' && <>

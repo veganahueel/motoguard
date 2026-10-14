@@ -5,6 +5,17 @@ export type DeviceInfo = {
   lng?: number | string;
   latitud?: number | string;
   longitud?: number | string;
+  fuenteUbicacion?: 'GPS' | 'MANUAL' | 'DESCONOCIDA';
+  sensores?: {
+    vibracion?: boolean;
+    movimiento?: boolean;
+    inclinacionGrados?: number;
+    pesoKg?: number;
+    pesoValido?: boolean;
+    pesoEstimado?: boolean;
+    hx711Raw?: number;
+    gpsSatelites?: number;
+  };
   actualizadoEn?: string | number;
   ultimaConexion?: number;
   ownerUid?: string;
