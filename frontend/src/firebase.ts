@@ -1,5 +1,9 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getAuth, initializeAuth } from 'firebase/auth';
+// En Expo/React Native, algunas versiones de Firebase no exponen este símbolo
+// en los tipos web que TypeScript selecciona, aunque sí exista en el runtime nativo.
+// @ts-expect-error Exportación React Native omitida por los tipos seleccionados de Firebase.
+import { getReactNativePersistence } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

@@ -10,6 +10,13 @@ export type DeviceInfo = {
   ownerUid?: string;
   historial?: Record<string, unknown>;
   alertas?: Record<string, any>;
+  calibracion?: {
+    estado?: 'PENDIENTE' | 'GUARDADA';
+    guardadaEn?: number;
+    solicitadaEn?: number;
+    umbralGrados?: number;
+    vector?: {x:number; y:number; z:number};
+  };
 };
 
 export type Screen = 'inicio' | 'ubicacion' | 'alertas' | 'cuenta';

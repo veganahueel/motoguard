@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { ref, set, serverTimestamp } from 'firebase/database';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { auth, firebaseConfigured } from './firebase';
+import { auth, db, firebaseConfigured } from './firebase';
 import { Brand, Button, InfoBox } from './ui';
 import { colors } from './theme';
 
@@ -25,15 +26,41 @@ export default function AuthScreen({ onPreview }: { onPreview: () => void }) {
   const [working, setWorking] = useState(false);
 
   async function submit() {
-    if (!auth) return Alert.alert('Falta Firebase', 'Completá el archivo .env para activar el registro real.');
-    if (!email.trim() || !password) return Alert.alert('Revisá tus datos', 'Ingresá tu correo y contraseña.');
+    if (!auth || !db) return Alert.alert('Falta Firebase', 'Completá el archivo .env para activar el registro real.');
+    const correo = email.trim();
+    if (!correo || !password) return Alert.alert('Revisá tus datos', 'Ingresá tu correo y contraseña.');
     if (register && password.length < 12) return Alert.alert('Contraseña corta', 'Para registrar una cuenta, usá al menos 12 caracteres.');
+
+    setWorking(true);
     try {
-      setWorking(true);
-      if (register) await createUserWithEmailAndPassword(auth, email.trim(), password);
-      else await signInWithEmailAndPassword(auth, email.trim(), password);
-    } catch (err: any) { Alert.alert('MotoGuard', describeError(err?.code ?? '')); }
-    finally { setWorking(false); }
+      if (register) {
+        // Authentication crea la cuenta y genera un UID único.
+        const credencial = await createUserWithEmailAndPassword(auth, correo, password);
+        const usuario = credencial.user;
+
+        try {
+          // Guardar el perfil bajo el mismo UID, sin almacenar contraseñas.
+          await set(ref(db, `MotoGuard/usuarios/${usuario.uid}`), {
+            uid: usuario.uid,
+            email: usuario.email ?? correo,
+            creadoEn: serverTimestamp(),
+          });
+        } catch (error: any) {
+          // La cuenta YA existe en Authentication. No indicar que falló el registro.
+          console.error('MotoGuard: no se pudo guardar el perfil en Realtime Database:', error);
+          Alert.alert(
+            'Cuenta creada, perfil pendiente',
+            'Tu cuenta se creó en Authentication, pero no se pudo guardar el perfil en Realtime Database. Revisá las reglas y la conexión. No vuelvas a registrarte: iniciá sesión con esta cuenta.'
+          );
+        }
+      } else {
+        await signInWithEmailAndPassword(auth, correo, password);
+      }
+    } catch (err: any) {
+      Alert.alert('MotoGuard', describeError(err?.code ?? ''));
+    } finally {
+      setWorking(false);
+    }
   }
 
   return (

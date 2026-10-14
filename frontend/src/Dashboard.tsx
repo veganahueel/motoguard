@@ -25,6 +25,7 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
   const [codeInput,setCodeInput]=useState('');
   const [linkBusy,setLinkBusy]=useState(false);
   const [changingProtection,setChangingProtection]=useState(false);
+  const [calibrating,setCalibrating]=useState(false);
   const [clock,setClock]=useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setClock(Date.now()), 5000);
@@ -39,6 +40,8 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
   const state = String(device?.estado || 'SIN DATOS').replace(/_/g,' ');
   const alarm = ['ALERTA','MOVIMIENTO CONFIRMADO','MOVIMIENTO_CONFIRMADO'].includes(String(device?.estado||'').toUpperCase());
   const active = device?.activo === true || device?.activo === 1 || device?.activo === 'true';
+  const calibrationPending = device?.calibracion?.estado === 'PENDIENTE';
+  const calibrationSaved = device?.calibracion?.estado === 'GUARDADA';
   const events = useMemo(() => {
     const raw = device?.historial ?? device?.alertas;
     if (!raw || typeof raw !== 'object') return [];
@@ -76,29 +79,76 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
 
   function requestProtectionChange() {
     if (!device || !uid || !deviceCode || preview || !db) return;
-    if (!active && !online) {
-      Alert.alert('Dispositivo desconectado', 'No podemos confirmar que el ESP32 reciba o aplique el cambio. Esperá a que vuelva a conectarse.');
+    if (calibrationPending || calibrating || changingProtection) {
+      return Alert.alert('Calibración en curso', 'Esperá a que el ESP32 termine de medir la posición.');
+    }
+
+    // Armar siempre requiere medir nuevamente la posición real de la moto.
+    // No escribimos activo=true directamente en Firebase.
+    if (!active) {
+      requestCalibration();
       return;
     }
-    const next = !active;
+
     Alert.alert(
-      next ? 'Activar protección' : 'Desactivar protección',
-      next ? `¿Querés activar la vigilancia de ${deviceCode}? Las vibraciones podrán generar alertas.` : '¿Querés desactivar las alertas de movimiento de este dispositivo?',
+      'Desactivar protección',
+      `¿Querés desactivar las alertas de movimiento de ${deviceCode}?`,
       [
-        {text:'Cancelar', style:'cancel'},
-        {text:next ? 'Activar' : 'Desactivar', onPress:async()=>{
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Desactivar', onPress: async () => {
           try {
             setChangingProtection(true);
             if (auth?.currentUser?.uid !== uid) throw new Error('Sesión no válida');
-            // Las reglas solo permiten cambiar el campo booleano activo si sos propietario.
-            await set(ref(db, `MotoGuard/dispositivos/${deviceCode}/activo`), next);
-          } catch (error) {
-            Alert.alert('No se pudo cambiar', 'Revisá tu conexión y las reglas de seguridad de Firebase.');
+            const database = db;
+            if (!database) throw new Error('Base de datos no disponible');
+            await set(ref(database, `MotoGuard/dispositivos/${deviceCode}/activo`), false);
+          } catch (_error) {
+            Alert.alert('No se pudo desactivar', 'Revisá tu conexión y las reglas de seguridad de Firebase.');
           } finally {
             setChangingProtection(false);
           }
-        }}
-      ]
+        } },
+      ],
+    );
+  }
+
+  function requestCalibration() {
+    if (!device || !uid || !deviceCode || preview || !auth) return;
+    if (!online) return Alert.alert('ESP32 desconectado', 'El ESP32 debe estar conectado a internet para calibrar.');
+    if (calibrationPending || calibrating) {
+      return Alert.alert('Calibración en curso', 'La moto debe permanecer quieta.');
+    }
+    Alert.alert(
+      'Calibrar y activar',
+      'Dejá la moto estacionada y quieta. El ESP32 medirá su posición y activará la protección únicamente cuando termine de calibrar.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Calibrar', onPress: async () => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 70000);
+          try {
+            setCalibrating(true);
+            const authInstance = auth;
+            const currentUser = authInstance?.currentUser;
+            if (!currentUser || currentUser.uid !== uid) throw new Error('Sesión no válida');
+            const token = await currentUser.getIdToken();
+            const response = await fetch('https://motoguard-api.onrender.com/api/calibrar', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ dispositivo: deviceCode }),
+              signal: controller.signal,
+            });
+            const data = await response.json().catch(() => ({})) as { error?: string; mensaje?: string };
+            if (!response.ok) throw new Error(data.error || `Error del servidor: ${response.status}`);
+            Alert.alert('Calibración solicitada', data.mensaje || 'Dejá la moto quieta y esperá la confirmación del ESP32.');
+          } catch (error: any) {
+            Alert.alert('No se pudo calibrar', error?.message || 'Revisá la conexión con Render.');
+          } finally {
+            clearTimeout(timer);
+            setCalibrating(false);
+          }
+        } },
+      ],
     );
   }
 
@@ -123,7 +173,7 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
           <Text style={styles.sectionTitle}>Panel de seguridad</Text>
           <View style={[styles.hero,{borderColor:alarm?'#8D4357':colors.stroke}]}>
             <View style={[styles.heroIcon,{backgroundColor:alarm?'#52243B':'#143E49'}]}><Ionicons name={alarm?'warning-outline':'shield-checkmark-outline'} size={37} color={alarm?colors.red:colors.cyan}/></View>
-            <Text style={styles.heroLabel}>{alarm?'ALERTA DE SEGURIDAD':active?'PROTECCIÓN ACTIVADA':'PROTECCIÓN DESACTIVADA'}</Text>
+            <Text style={styles.heroLabel}>{alarm?'ALERTA DE SEGURIDAD':calibrationPending?'CALIBRANDO POSICIÓN':active?'PROTECCIÓN ACTIVADA':'PROTECCIÓN DESACTIVADA'}</Text>
             <Text style={styles.heroStatus}>{preview?'Vista de ejemplo':!device?'SIN DISPOSITIVO':!online?'SIN CONEXIÓN':state}</Text>
             <Text style={styles.heroDetail}>{deviceCode?`Dispositivo: ${deviceCode}`:'No hay dispositivo vinculado'}</Text>
             <View style={styles.statRow}>
@@ -133,17 +183,17 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
           </View>
           <View style={styles.card}>
             <Text style={styles.cardLabel}>CONTROL DE PROTECCIÓN</Text>
-            <Text style={styles.cardValue}>{active ? 'Alarma activada' : 'Alarma desactivada'}</Text>
+            <Text style={styles.cardValue}>{calibrationPending ? 'Calibración pendiente' : active ? 'Alarma activada' : 'Alarma desactivada'}</Text>
             <Text style={styles.subtitle}>{online ? 'ESP32 conectado · Actualización automática' : 'ESP32 sin comunicación reciente. No se puede confirmar la protección.'}</Text>
             <Button
-              text={active ? 'Desactivar protección' : 'Activar protección'}
+              text={active ? 'Desactivar protección' : calibrationPending ? 'Calibrando posición…' : 'Calibrar y activar protección'}
               icon={active ? 'lock-open-outline' : 'lock-closed-outline'}
               variant={active ? 'secondary' : 'primary'}
-              loading={changingProtection}
-              disabled={!device || !uid || preview || changingProtection || (!active && !online)}
+              loading={changingProtection || calibrating}
+              disabled={!device || !uid || preview || changingProtection || calibrating || calibrationPending || (!active && !online)}
               onPress={requestProtectionChange}
             />
-            <Text style={styles.subtitle}>El cambio se guarda en Firebase y solo funciona para la cuenta propietaria. No controla el encendido de la moto.</Text>
+            <Text style={styles.subtitle}>{calibrationPending ? 'Dejá la moto quieta: el ESP32 debe completar la calibración antes de activar la protección.' : calibrationSaved ? 'Posición calibrada. Al volver a activar se tomará una nueva referencia.' : 'Al activar, MotoGuard solicita una calibración real del MPU6050.'} No controla el encendido de la moto.</Text>
           </View>
           <Text style={styles.sectionTitle}>Accesos rápidos</Text>
           <View style={styles.actions}>
