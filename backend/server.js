@@ -71,7 +71,7 @@ app.disable('x-powered-by');
 if (process.env.RENDER === 'true') app.set('trust proxy', 1);
 app.use(helmet());
 app.use(express.json({ limit: '2kb', strict: true }));
-app.use(['/api/dispositivo', '/api/calibrar'], rateLimit({
+app.use(['/api/dispositivo', '/api/calibrar', '/api/peso/rango'], rateLimit({
   windowMs: 60 * 1000,
   limit: 60,
   standardHeaders: 'draft-7',
@@ -166,6 +166,46 @@ app.post('/api/calibrar', async (req, res) => {
     if (error.code?.startsWith('auth/')) return res.status(401).json({ error: 'Sesion vencida' });
     console.error('No se pudo solicitar calibracion:', error.message);
     return res.status(500).json({ error: 'No se pudo iniciar la calibracion' });
+  }
+});
+
+// El rango de peso se configura aun si el HX711 esta desconectado.
+// El peso corporal del usuario NO se guarda aqui: es independiente de la
+// carga medida por el prototipo y se conserva localmente en la app.
+app.post('/api/peso/rango', async (req, res) => {
+  const header = req.get('authorization') || '';
+  const match = /^Bearer (\S+)$/.exec(header);
+  if (!match) return res.status(401).json({ error: 'Falta iniciar sesion' });
+
+  const { dispositivo, minKg, maxKg } = req.body || {};
+  if (typeof dispositivo !== 'string' || !/^[A-Z0-9_-]{3,40}$/.test(dispositivo)) {
+    return res.status(400).json({ error: 'Codigo de dispositivo incorrecto' });
+  }
+  if (typeof minKg !== 'number' || typeof maxKg !== 'number' ||
+      !Number.isFinite(minKg) || !Number.isFinite(maxKg) ||
+      minKg < 0 || maxKg > 20 || minKg >= maxKg) {
+    return res.status(400).json({
+      error: 'Rango invalido. Indica dos pesos entre 0 y 20 kg, con minimo menor al maximo.',
+    });
+  }
+
+  try {
+    const decoded = await getAuth().verifyIdToken(match[1]);
+    const ref = getDatabase().ref(`MotoGuard/dispositivos/${dispositivo}`);
+    const snap = await ref.once('value');
+    if (!snap.exists()) return res.status(404).json({ error: 'Dispositivo inexistente' });
+    if (snap.child('ownerUid').val() !== decoded.uid) {
+      return res.status(403).json({ error: 'Tu cuenta no es propietaria del dispositivo' });
+    }
+
+    // El firmware V9 interpreta ambos valores como kilogramos y los convierte
+    // a gramos al evaluar la lectura del HX711.
+    await ref.update({ peso_min: minKg, peso_max: maxKg });
+    return res.json({ ok: true, dispositivo, minKg, maxKg });
+  } catch (error) {
+    if (error.code?.startsWith('auth/')) return res.status(401).json({ error: 'Sesion vencida' });
+    console.error('No se pudo guardar el rango:', error.message);
+    return res.status(500).json({ error: 'No se pudo guardar el rango de peso' });
   }
 });
 
