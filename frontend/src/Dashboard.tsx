@@ -108,7 +108,7 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
       const title = data ? String(data.estado ?? data.mensaje ?? data.tipo ?? 'Movimiento detectado') : String(item);
       return {
         id,
-        title: title.replace(/_/g, ' '),
+        title: title.replace(/_/g, ' ') + (data && typeof data.peso === 'number' && Number.isFinite(data.peso) && data.peso >= 0 ? ` · ${data.peso.toFixed(1)} g` : ''),
         date: validMs ? new Date(ms).toLocaleString('es-AR') : '',
         timestamp: validMs ? ms : 0,
       };
