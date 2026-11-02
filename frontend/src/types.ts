@@ -19,6 +19,13 @@ export type DeviceInfo = {
   actualizadoEn?: string | number;
   ultimaConexion?: number;
   ownerUid?: string;
+  // V9 PESOv5 publica la lectura en gramos y el rango en kilogramos.
+  peso_actual?: number;
+  peso_min?: number;
+  peso_max?: number;
+  peso_ts?: number;
+  estado_peso?: string;
+  moto_encendida?: boolean;
   historial?: Record<string, unknown>;
   alertas?: Record<string, any>;
   calibracion?: {
