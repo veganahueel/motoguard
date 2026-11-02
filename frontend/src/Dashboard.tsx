@@ -69,7 +69,9 @@ export default function Dashboard({ preview, email, uid, deviceCode, onDeviceCod
     pesoV9 >= 0 && pesoV9 <= 20000 &&
     !['BALANZA_ERROR','INICIANDO'].includes(estadoPesoV9);
   const pesoBackend = device?.sensores?.pesoKg;
-  const pesoBackendDisponible = online && device?.sensores?.pesoValido === true &&
+  const tieneFormatoV9 = typeof device?.estado_peso === 'string' ||
+    typeof device?.peso_ts === 'number';
+  const pesoBackendDisponible = !tieneFormatoV9 && online && device?.sensores?.pesoValido === true &&
     typeof pesoBackend === 'number' && Number.isFinite(pesoBackend) &&
     pesoBackend >= 0 && pesoBackend <= 20;
   const pesoTexto = preview ? '0,250 kg (ejemplo)' :
